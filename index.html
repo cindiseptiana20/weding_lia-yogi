@@ -1,0 +1,1230 @@
+<!doctype html>
+<html lang="id" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Undangan Pernikahan Yogi & Lia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine.js loaded with defer for clean non-blocking parser execution -->
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+
+    <!-- Google Fonts: Cormorant Garamond (Elegant Serif) & Inter (Modern Sans-Serif) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght=0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght=300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              dustyrose: {
+                50: "#BDC3C7",
+                100: "#f6eded",
+                200: "#edd6d7",
+                300: "#dfb4b6",
+                400: "#cd8d91",
+                500: "#b76e73", // Base Dusty Rose
+                600: "#a25459",
+                700: "#874246",
+                800: "#70373b",
+                900: "#5e3033",
+                950: "#321719",
+              },
+              stone: {
+                850: "#201c1a",
+              },
+            },
+            fontFamily: {
+              serif: ["Cormorant Garamond", "serif"],
+              sans: ["Inter", "sans-serif"],
+            },
+            animation: {
+              "fade-in-up": "fadeInUp 1s ease-out forwards",
+              "spin-slow": "spin 12s linear infinite",
+              "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+              float: "float 4s ease-in-out infinite",
+            },
+            keyframes: {
+              fadeInUp: {
+                "0%": { opacity: "0", transform: "translateY(20px)" },
+                "100%": { opacity: "1", transform: "translateY(0)" },
+              },
+              float: {
+                "0%, 100%": { transform: "translateY(0)" },
+                "50%": { transform: "translateY(-10px)" },
+              },
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      [x-cloak] {
+        display: none !important;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+      }
+
+      .font-serif-title {
+        font-family: "Cormorant Garamond", serif;
+      }
+
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #66122e;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cd8d91;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #b76e73;
+      }
+
+      /* Soft vignette background styling */
+      .vignette-overlay {
+        background: radial-gradient(
+          circle,
+          rgba(0, 0, 0, 0) 40%,
+          rgba(0, 0, 0, 0.6) 100%
+        );
+      }
+    </style>
+  </head>
+  <body
+    class="bg-dustyrose-50 text-stone-800 antialiased selection:bg-dustyrose-200"
+    x-data="weddingInvitationApp()"
+  >
+    <!-- Audio Element Fallback (Memuat link direct MP3 dari Vocaroo kustom) -->
+    <audio id="backup-audio-element" loop preload="auto" class="hidden">
+      <source
+        src="https://media1.vocaroo.com/mp3/19uNOsLTfSUf"
+        type="audio/mpeg"
+      />
+      <source
+        src="https://media.vocaroo.com/mp3/19uNOsLTfSUf"
+        type="audio/mpeg"
+      />
+    </audio>
+
+    <!-- Tombol kendali audio mengambang yang akan muncul begitu Cover dibuka -->
+    <div
+      class="fixed bottom-6 right-6 z-50"
+      x-show="!isCoverActive"
+      x-transition:enter="transition ease-out duration-500 transform scale-0"
+      x-transition:enter-end="scale-100"
+    >
+      <button
+        @click="toggleMusicState()"
+        class="p-4 bg-white/90 backdrop-blur-md text-dustyrose-600 rounded-full shadow-xl border border-dustyrose-100 hover:bg-white hover:scale-105 active:scale-95 transition-all flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-dustyrose-400"
+        aria-label="Toggle Background Music"
+      >
+        <template x-if="isMusicPlaying">
+          <div class="relative flex items-center justify-center h-6 w-6">
+            <span
+              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-dustyrose-300 opacity-75"
+            ></span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 animate-spin-slow"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+              />
+            </svg>
+          </div>
+        </template>
+        <template x-if="!isMusicPlaying">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6 text-stone-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zm11.779-7.221a1 1 0 111.414 1.414 3 3 0 000 4.242 1 1 0 11-1.414 1.414 5 5 0 010-7.07z"
+            />
+          </svg>
+        </template>
+      </button>
+    </div>
+
+    <!-- Gerbang Cover Utama: Memaksa interaksi pengguna agar pemutaran musik diizinkan oleh browser -->
+    <div
+      x-show="isCoverActive"
+      x-transition:leave="transition ease-in-out duration-1000 transform"
+      x-transition:leave-start="translate-y-0 opacity-100"
+      x-transition:leave-end="-translate-y-full opacity-0"
+      class="fixed inset-0 z-50 flex flex-col justify-between text-center px-6 py-12 bg-stone-900 text-white select-none overflow-hidden"
+    >
+      <!-- Background Banner Layer with Smooth Scale On Load -->
+      <div class="absolute inset-0 z-0">
+        <img
+          src="image/foto3.jpeg"
+          alt="Yogi & Lia Cover Image"
+          class="w-full h-full object-cover opacity-50 scale-105 transition-transform duration-[6000ms] ease-out"
+          :class="!isCoverActive ? 'scale-100' : ''"
+        />
+        <div class="absolute inset-0 vignette-overlay"></div>
+      </div>
+
+      <!-- Upper Floral Ornament & Welcome Note -->
+      <div class="z-10 mt-4 space-y-3">
+        <p
+          class="text-[10px] md:text-xs tracking-[0.35em] uppercase text-dustyrose-200 font-medium"
+        >
+          The Wedding Celebration of
+        </p>
+        <div class="w-12 h-[1px] bg-dustyrose-300/60 mx-auto"></div>
+      </div>
+
+      <!-- Couple Name Headline & Personalized Guest Widget -->
+      <div class="z-10 my-auto py-10 space-y-8">
+        <h1
+          class="font-serif-title text-5xl md:text-8xl font-light tracking-wide text-white"
+        >
+          Yogi &amp; Lia
+        </h1>
+        <p class="text-xs md:text-sm tracking-[0.2em] text-dustyrose-100">
+          Rabu, 03 Juni 2026
+        </p>
+
+        <!-- Recipient guest personalized module -->
+        <div
+          class="mt-8 inline-block px-6 py-5 rounded-2xl border border-white/10 bg-black/45 backdrop-blur-md max-w-sm w-full mx-auto shadow-2xl transition-all"
+        >
+          <p
+            class="text-[10px] uppercase tracking-widest text-dustyrose-300 mb-2"
+          >
+            Kepada Yth. Bapak/Ibu/Saudara/i:
+          </p>
+          <h2
+            class="font-serif-title text-xl md:text-2xl font-semibold text-white mb-2"
+            x-text="invitedGuest"
+          ></h2>
+          <p class="text-[10px] text-stone-300 italic">
+            Tanpa mengurangi rasa hormat, kami mengundang Anda untuk hadir di
+            hari bahagia kami.
+          </p>
+        </div>
+      </div>
+
+      <!-- Call to action button with float animation -->
+      <div class="z-10 mb-4 animate-float">
+        <button
+          @click="openInvitationAndStart()"
+          class="px-8 py-3.5 bg-dustyrose-500 hover:bg-dustyrose-600 text-white rounded-full font-medium text-xs uppercase tracking-[0.25em] shadow-xl hover:scale-105 active:scale-95 transition-all duration-300"
+        >
+          Buka Undangan
+        </button>
+      </div>
+    </div>
+
+    <!-- Content starts here once cover gets unlocked by visitor -->
+    <div
+      x-show="!isCoverActive"
+      x-transition:enter="transition ease-out duration-1000 delay-300"
+      class="relative z-10 min-h-screen"
+    >
+      <header
+        class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-dustyrose-100/40 py-4 px-6 flex items-center justify-between shadow-sm"
+      >
+        <span
+          class="font-serif-title text-2xl font-bold tracking-widest text-dustyrose-700"
+          >Y &amp; L</span
+        >
+        <span class="text-[11px] tracking-widest text-stone-500 font-medium"
+          >03 . 06 . 2026</span
+        >
+      </header>
+
+      <section
+        class="min-h-[85vh] flex flex-col justify-center items-center relative px-6 text-center overflow-hidden"
+      >
+        <div class="absolute inset-0 -z-10">
+          <img
+            src="image/foto2.jpeg"
+            alt="Yogi & Lia Hero Section"
+            class="w-full h-full object-cover opacity-20 filter saturate-50"
+          />
+          <div
+            class="absolute inset-0 bg-gradient-to-b from-dustyrose-50/10 via-dustyrose-50/70 to-dustyrose-50"
+          ></div>
+        </div>
+
+        <span
+          class="text-[10px] md:text-xs uppercase tracking-[0.4em] text-dustyrose-600 mb-4 font-bold"
+          >Walimatul 'Ursy</span
+        >
+        <h1
+          class="font-serif-title text-6xl md:text-9xl font-light text-stone-900 tracking-wide mb-4"
+        >
+          Yogi &amp; Lia
+        </h1>
+        <div class="w-16 h-[1.5px] bg-dustyrose-400 mb-6"></div>
+        <p
+          class="text-xs md:text-sm tracking-[0.25em] uppercase font-light text-stone-600"
+        >
+          Rabu, 03 Juni 2026
+        </p>
+      </section>
+
+      <!-- Bagian Kutipan Qur'an / Cerita Cinta Perjalanan Mempelai -->
+      <section class="py-20 px-6 text-center bg-white/40">
+        <div class="max-w-2xl mx-auto space-y-6">
+          <!-- SVG Decorative Separator -->
+          <div class="flex justify-center mb-2">
+            <svg
+              class="w-12 h-12 text-dustyrose-300"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.25z"
+              />
+            </svg>
+          </div>
+          <p
+            class="font-serif-title text-xl md:text-2xl text-stone-700 italic font-light leading-relaxed"
+          >
+            "Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan
+            untukmu isteri-isteri dari jenismu sendiri, supaya kamu cenderung
+            dan merasa tenteram kepadanya, dan dijadikan-Nya diantaramu rasa
+            kasih dan sayang."
+          </p>
+          <div class="w-8 h-[1px] bg-dustyrose-200 mx-auto"></div>
+          <span
+            class="text-xs uppercase tracking-widest text-dustyrose-600 font-bold block"
+            >(QS. Ar-Rum: 21)</span
+          >
+        </div>
+      </section>
+
+      <!-- Profil Mempelai: Yogi & Lia -->
+      <section id="mempelai" class="py-24 px-6 bg-white/70">
+        <div class="max-w-5xl mx-auto">
+          <div class="text-center mb-16 space-y-3">
+            <span
+              class="text-xs uppercase tracking-[0.25em] text-dustyrose-500 font-bold"
+              >Assalamu’alaikum Wr. Wb.</span
+            >
+            <h2
+              class="font-serif-title text-4xl md:text-6xl font-light tracking-wide text-stone-900"
+            >
+              Kedua Mempelai
+            </h2>
+            <p
+              class="text-xs md:text-sm text-stone-500 max-w-lg mx-auto leading-relaxed"
+            >
+              Dengan memohon rahmat dan ridho Allah SWT, kami dengan penuh rasa
+              hormat mengundang Anda untuk merayakan pernikahan suci kami:
+            </p>
+          </div>
+
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 items-stretch"
+          >
+            <!-- Groom Profile Card -->
+            <div
+              class="flex flex-col items-center text-center p-8 md:p-12 rounded-3xl bg-white border border-dustyrose-100 shadow-md hover:shadow-xl transition-all duration-300"
+            >
+              <!-- Rounded frame with avatar placeholder -->
+              <div
+                class="relative w-40 h-40 rounded-full border border-dustyrose-200 p-2 mb-8 bg-dustyrose-50"
+              >
+                <div
+                  class="w-full h-full rounded-full overflow-hidden bg-dustyrose-100 flex items-center justify-center"
+                >
+                  <span class="font-serif-title text-5xl text-dustyrose-400"
+                    >Y</span
+                  >
+                </div>
+              </div>
+              <h3
+                class="font-serif-title text-3xl md:text-4xl font-light text-stone-900 mb-1"
+              >
+                Yogi Mulyana
+              </h3>
+              <p
+                class="text-sm font-serif-title italic text-dustyrose-600 mb-5"
+              >
+                Yogi
+              </p>
+              <div class="w-10 h-[1px] bg-dustyrose-200 mb-5"></div>
+              <p
+                class="text-xs text-stone-500 font-light uppercase tracking-wider mb-2"
+              >
+                Anak Pertama dari Pasangan:
+              </p>
+              <p class="text-base text-stone-800 font-medium">
+                Bapak Nana Suherna
+              </p>
+              <p class="text-xs text-stone-400 font-light italic my-0.5">
+                &amp;
+              </p>
+              <p class="text-base text-stone-800 font-medium">
+                Ibu Dede Sukmini
+              </p>
+            </div>
+
+            <!-- Bride Profile Card -->
+            <div
+              class="flex flex-col items-center text-center p-8 md:p-12 rounded-3xl bg-white border border-dustyrose-100 shadow-md hover:shadow-xl transition-all duration-300"
+            >
+              <!-- Rounded frame with avatar placeholder -->
+              <div
+                class="relative w-40 h-40 rounded-full border border-dustyrose-200 p-2 mb-8 bg-dustyrose-50"
+              >
+                <div
+                  class="w-full h-full rounded-full overflow-hidden bg-dustyrose-100 flex items-center justify-center"
+                >
+                  <span class="font-serif-title text-5xl text-dustyrose-400"
+                    >L</span
+                  >
+                </div>
+              </div>
+              <h3
+                class="font-serif-title text-3xl md:text-4xl font-light text-stone-900 mb-1"
+              >
+                Nurlia Sari
+              </h3>
+              <p
+                class="text-sm font-serif-title italic text-dustyrose-600 mb-5"
+              >
+                Lia
+              </p>
+              <div class="w-10 h-[1px] bg-dustyrose-200 mb-5"></div>
+              <p
+                class="text-xs text-stone-500 font-light uppercase tracking-wider mb-2"
+              >
+                Anak Kedua dari Pasangan:
+              </p>
+              <p class="text-base text-stone-800 font-medium">Bapak Rusdin</p>
+              <p class="text-xs text-stone-400 font-light italic my-0.5">
+                &amp;
+              </p>
+              <p class="text-base text-stone-800 font-medium">Ibu Endar</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Penghitung Mundur Real-Time ke Hari H -->
+      <section
+        class="py-20 px-6 text-center bg-dustyrose-100/40 border-y border-dustyrose-100/50"
+      >
+        <div class="max-w-3xl mx-auto space-y-3">
+          <span
+            class="text-[10px] uppercase tracking-[0.3em] text-dustyrose-600 font-bold block"
+            >Menuju Hari Bahagia</span
+          >
+          <h3 class="font-serif-title text-4xl font-light text-stone-900 mb-8">
+            Save The Date
+          </h3>
+
+          <!-- Countdown Grid -->
+          <div class="grid grid-cols-4 gap-3 md:gap-6 max-w-lg mx-auto">
+            <div
+              class="bg-white border border-dustyrose-200/40 p-4 md:p-6 rounded-2xl shadow-sm"
+            >
+              <span
+                class="block font-serif-title text-3xl md:text-5xl font-light text-dustyrose-600"
+                x-text="countdownClock.days"
+                >00</span
+              >
+              <span
+                class="text-[9px] md:text-[10px] uppercase tracking-wider text-stone-500 font-medium"
+                >Hari</span
+              >
+            </div>
+            <div
+              class="bg-white border border-dustyrose-200/40 p-4 md:p-6 rounded-2xl shadow-sm"
+            >
+              <span
+                class="block font-serif-title text-3xl md:text-5xl font-light text-dustyrose-600"
+                x-text="countdownClock.hours"
+                >00</span
+              >
+              <span
+                class="text-[9px] md:text-[10px] uppercase tracking-wider text-stone-500 font-medium"
+                >Jam</span
+              >
+            </div>
+            <div
+              class="bg-white border border-dustyrose-200/40 p-4 md:p-6 rounded-2xl shadow-sm"
+            >
+              <span
+                class="block font-serif-title text-3xl md:text-5xl font-light text-dustyrose-600"
+                x-text="countdownClock.minutes"
+                >00</span
+              >
+              <span
+                class="text-[9px] md:text-[10px] uppercase tracking-wider text-stone-500 font-medium"
+                >Menit</span
+              >
+            </div>
+            <div
+              class="bg-white border border-dustyrose-200/40 p-4 md:p-6 rounded-2xl shadow-sm"
+            >
+              <span
+                class="block font-serif-title text-3xl md:text-5xl font-light text-dustyrose-600"
+                x-text="countdownClock.seconds"
+                >00</span
+              >
+              <span
+                class="text-[9px] md:text-[10px] uppercase tracking-wider text-stone-500 font-medium"
+                >Detik</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Agenda & Lokasi Acara: Akad & Resepsi -->
+      <section id="acara" class="py-24 px-6 bg-white">
+        <div class="max-w-5xl mx-auto">
+          <div class="text-center mb-16 space-y-2">
+            <h2
+              class="font-serif-title text-4xl md:text-6xl font-light tracking-wide text-stone-900"
+            >
+              Agenda Acara
+            </h2>
+            <p
+              class="text-xs md:text-sm uppercase tracking-[0.2em] text-dustyrose-500 font-semibold"
+            >
+              Waktu &amp; Lokasi Pertemuan
+            </p>
+          </div>
+
+          <div
+            class="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12 items-stretch mb-12"
+          >
+            <!-- Akad Card -->
+            <div
+              class="bg-dustyrose-50/50 border border-dustyrose-100 p-8 md:p-10 rounded-3xl flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow relative overflow-hidden"
+            >
+              <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                  <span
+                    class="px-4 py-1.5 bg-dustyrose-100/80 text-dustyrose-800 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                    >Akad Nikah</span
+                  >
+                  <span class="text-2xl">💍</span>
+                </div>
+
+                <h4 class="font-serif-title text-3xl font-light text-stone-900">
+                  Ijab &amp; Qobul
+                </h4>
+                <div class="space-y-4 text-stone-700 text-sm font-light">
+                  <p class="flex items-start gap-4">
+                    <span
+                      class="text-stone-400 font-medium w-16 uppercase tracking-wider text-[10px] mt-1"
+                      >Hari:</span
+                    >
+                    <span class="text-stone-900 font-semibold"
+                      >Rabu, 03 Juni 2026</span
+                    >
+                  </p>
+                  <p class="flex items-start gap-4">
+                    <span
+                      class="text-stone-400 font-medium w-16 uppercase tracking-wider text-[10px] mt-1"
+                      >Pukul:</span
+                    >
+                    <span class="text-stone-900 font-semibold"
+                      >08:00 - 10:00 WIB</span
+                    >
+                  </p>
+                  <p class="flex items-start gap-4">
+                    <span
+                      class="text-stone-400 font-medium w-16 uppercase tracking-wider text-[10px] mt-1"
+                      >Lokasi:</span
+                    >
+                    <span
+                      class="text-stone-900 font-medium flex-1 leading-relaxed"
+                    >
+                      cipicung kec.kuningan<br />
+                      <span class="text-xs text-stone-500 font-light mt-1 block"
+                        >Silakan ikuti petunjuk rute Maps di bawah</span
+                      >
+                    </span>
+                  </p>
+                </div>
+              </div>
+              <div class="mt-8 pt-6 border-t border-dustyrose-100">
+                <a
+                  :href="mapsNavigationUrl"
+                  target="_blank"
+                  class="w-full inline-flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-xs font-semibold uppercase tracking-widest bg-dustyrose-600 hover:bg-dustyrose-700 text-white shadow-md hover:scale-[1.02] active:scale-95 transition-all text-center"
+                >
+                  📍 Buka Rute Peta
+                </a>
+              </div>
+            </div>
+
+            <!-- Resepsi Card -->
+            <div
+              class="bg-dustyrose-50/50 border border-dustyrose-100 p-8 md:p-10 rounded-3xl flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow relative overflow-hidden"
+            >
+              <div class="space-y-6">
+                <div class="flex items-center justify-between">
+                  <span
+                    class="px-4 py-1.5 bg-dustyrose-100/80 text-dustyrose-800 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                    >Resepsi</span
+                  >
+                  <span class="text-2xl">🥂</span>
+                </div>
+
+                <h4 class="font-serif-title text-3xl font-light text-stone-900">
+                  Pesta Perayaan
+                </h4>
+                <div class="space-y-4 text-stone-700 text-sm font-light">
+                  <p class="flex items-start gap-4">
+                    <span
+                      class="text-stone-400 font-medium w-16 uppercase tracking-wider text-[10px] mt-1"
+                      >Hari:</span
+                    >
+                    <span class="text-stone-900 font-semibold"
+                      >Rabu, 03 Juni 2026</span
+                    >
+                  </p>
+                  <p class="flex items-start gap-4">
+                    <span
+                      class="text-stone-400 font-medium w-16 uppercase tracking-wider text-[10px] mt-1"
+                      >Pukul:</span
+                    >
+                    <span class="text-stone-900 font-semibold"
+                      >08:00 WIB s.d Selesai</span
+                    >
+                  </p>
+                  <p class="flex items-start gap-4">
+                    <span
+                      class="text-stone-400 font-medium w-16 uppercase tracking-wider text-[10px] mt-1"
+                      >Lokasi:</span
+                    >
+                    <span
+                      class="text-stone-900 font-medium flex-1 leading-relaxed"
+                    >
+                      cipicung kec.kuningan<br />
+                      <span class="text-xs text-stone-500 font-light mt-1 block"
+                        >Dilaksanakan di tempat yang sama dengan Akad</span
+                      >
+                    </span>
+                  </p>
+                </div>
+              </div>
+              <div class="mt-8 pt-6 border-t border-dustyrose-100">
+                <a
+                  :href="mapsNavigationUrl"
+                  target="_blank"
+                  class="w-full inline-flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-xs font-semibold uppercase tracking-widest bg-dustyrose-600 hover:bg-dustyrose-700 text-white shadow-md hover:scale-[1.02] active:scale-95 transition-all text-center"
+                >
+                  📍 Buka Rute Peta
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Galeri Foto Pasangan: 6 Image Grid -->
+      <section id="galeri" class="py-24 px-6 bg-dustyrose-50">
+        <div class="max-w-5xl mx-auto">
+          <div class="text-center mb-16 space-y-2">
+            <span
+              class="text-xs uppercase tracking-[0.25em] text-dustyrose-500 font-bold block"
+              >Memori Indah Kami</span
+            >
+            <h2
+              class="font-serif-title text-4xl md:text-6xl font-light text-stone-900"
+            >
+              Galeri Foto
+            </h2>
+          </div>
+
+          <!-- 3 Columns responsive image grid -->
+          <div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+            <template x-for="(imgSrc, idx) in galleryImages" :key="idx">
+              <div
+                class="overflow-hidden rounded-2xl border border-white bg-stone-100 shadow-sm aspect-[4/5] relative group cursor-pointer"
+                @click="openLightbox(imgSrc)"
+              >
+                <img
+                  src="image/foto1.png"
+                  alt="Gallery item image"
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 filter brightness-95 group-hover:brightness-100"
+                />
+                <!-- Soft overlay -->
+                <div
+                  class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors"
+                ></div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </section>
+
+      <!-- Lightbox Modal for Gallery Images -->
+      <div
+        x-show="isLightboxActive"
+        x-cloak
+        @keydown.escape.window="isLightboxActive = false"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-sm"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+      >
+        <button
+          @click="isLightboxActive = false"
+          class="absolute top-6 right-6 text-white text-3xl focus:outline-none"
+        >
+          &times;
+        </button>
+        <img
+          src="image/foto1.png"
+          class="max-w-full max-h-[85vh] rounded-xl shadow-2xl object-contain"
+        />
+      </div>
+
+      <!-- RSVP Form & Buku Ucapan Digital Terintegrasi -->
+      <section
+        id="rsvp"
+        class="py-24 px-6 bg-dustyrose-100/20 border-t border-dustyrose-100/50"
+      >
+        <div
+          class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16"
+        >
+          <!-- Interactive RSVP Card -->
+          <div
+            class="lg:col-span-5 bg-white border border-dustyrose-100 p-8 rounded-3xl shadow-sm h-fit"
+          >
+            <h3
+              class="font-serif-title text-3xl font-light text-stone-900 mb-2"
+            >
+              Konfirmasi RSVP
+            </h3>
+            <p class="text-xs text-stone-500 font-light leading-relaxed mb-6">
+              Silakan konfirmasikan kehadiran Anda melalui formulir di bawah
+              ini:
+            </p>
+
+            <form
+              @submit.prevent="submitRsvpData()"
+              class="space-y-4 text-left"
+            >
+              <div>
+                <label
+                  class="block text-[10px] uppercase tracking-wider text-stone-400 font-bold mb-1"
+                  >Nama Anda</label
+                >
+                <input
+                  type="text"
+                  x-model="rsvpFormData.name"
+                  required
+                  placeholder="Nama Lengkap..."
+                  class="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-sm text-stone-900 focus:ring-1 focus:ring-dustyrose-500 outline-none transition-all"
+                />
+              </div>
+
+              <div>
+                <label
+                  class="block text-[10px] uppercase tracking-wider text-stone-400 font-bold mb-1"
+                  >Status Kehadiran</label
+                >
+                <select
+                  x-model="rsvpFormData.status"
+                  class="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-sm text-stone-900 focus:ring-1 focus:ring-dustyrose-500 outline-none transition-all bg-white"
+                >
+                  <option value="Hadir">Insya Allah, Saya Hadir</option>
+                  <option value="Ragu">Masih Ragu-Ragu</option>
+                  <option value="Tidak Hadir">Maaf, Berhalangan Hadir</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  class="block text-[10px] uppercase tracking-wider text-stone-400 font-bold mb-1"
+                  >Jumlah Tamu</label
+                >
+                <select
+                  x-model="rsvpFormData.totalGuests"
+                  class="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-sm text-stone-900 focus:ring-1 focus:ring-dustyrose-500 outline-none transition-all bg-white"
+                >
+                  <option value="1">1 Orang</option>
+                  <option value="2">2 Orang</option>
+                  <option value="3">3 Orang</option>
+                </select>
+              </div>
+
+              <div>
+                <label
+                  class="block text-[10px] uppercase tracking-wider text-stone-400 font-bold mb-1"
+                  >Doa Restu &amp; Ucapan</label
+                >
+                <textarea
+                  x-model="rsvpFormData.message"
+                  rows="4"
+                  required
+                  placeholder="Tulis ucapan selamat & doa hangat Anda..."
+                  class="w-full bg-stone-50 border border-stone-200 rounded-xl p-3 text-sm text-stone-900 focus:ring-1 focus:ring-dustyrose-500 outline-none resize-none transition-all"
+                ></textarea>
+              </div>
+
+              <button
+                type="submit"
+                class="w-full py-3.5 bg-dustyrose-600 hover:bg-dustyrose-700 text-white font-semibold rounded-xl text-xs uppercase tracking-widest transition-colors shadow-sm hover:shadow active:scale-95 duration-200"
+              >
+                Kirim Konfirmasi
+              </button>
+            </form>
+          </div>
+
+          <!-- Live Guest Book Wishes View -->
+          <div class="lg:col-span-7 flex flex-col justify-between">
+            <div>
+              <h3
+                class="font-serif-title text-3xl font-light text-stone-900 mb-2"
+              >
+                Buku Ucapan Digital
+              </h3>
+              <p class="text-xs text-stone-500 font-light leading-relaxed mb-6">
+                Merupakan kehormatan serta kebahagiaan bagi kami sekeluarga
+                apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa
+                restu di hari istimewa kami.
+              </p>
+
+              <!-- Wishes dynamic scroll container -->
+              <div
+                class="max-h-[420px] overflow-y-auto space-y-4 pr-2 custom-scrollbar"
+              >
+                <template x-for="wish in liveGuestWishes" :key="wish.id">
+                  <div
+                    class="bg-white border border-stone-100 p-5 rounded-2xl shadow-sm hover:shadow transition-shadow"
+                  >
+                    <div class="flex items-center justify-between mb-2">
+                      <span
+                        class="font-semibold text-xs text-stone-800"
+                        x-text="wish.name"
+                      ></span>
+                      <span
+                        class="px-2.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider"
+                        :class="wish.status === 'Hadir' ? 'bg-dustyrose-50 text-dustyrose-600 border border-dustyrose-100' : 'bg-stone-100 text-stone-500 border border-stone-200/50'"
+                        x-text="wish.status"
+                      ></span>
+                    </div>
+                    <p
+                      class="text-xs text-stone-600 font-light leading-relaxed"
+                      x-text="wish.message"
+                    ></p>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Kado Digital: Amplop Transfer Mandiri Fungsional -->
+      <section
+        class="py-24 px-6 text-center bg-white border-t border-dustyrose-100/50"
+      >
+        <div class="max-w-xl mx-auto space-y-4">
+          <span class="text-3xl inline-block">🎁</span>
+          <h3 class="font-serif-title text-3xl font-light text-stone-900">
+            Kado Digital
+          </h3>
+          <p
+            class="text-xs text-stone-500 font-light max-w-sm mx-auto mb-10 leading-relaxed"
+          >
+            Doa restu Anda adalah berkah terindah bagi kami. Namun, apabila Anda
+            ingin menyampaikan tanda kasih secara digital, silakan kirim melalui
+            rekening berikut:
+          </p>
+
+          <!-- Bank Card Layout -->
+          <div
+            class="p-6 md:p-8 bg-dustyrose-50/50 border border-dustyrose-100 rounded-3xl max-w-sm mx-auto text-left relative overflow-hidden shadow-sm"
+          >
+            <div class="flex justify-between items-center mb-6">
+              <span class="font-bold text-sm tracking-widest text-dustyrose-800"
+                >DANA</span
+              >
+              <div
+                class="w-10 h-6 bg-dustyrose-200/20 border border-dustyrose-300/30 rounded"
+              ></div>
+            </div>
+
+            <p
+              class="text-[9px] uppercase tracking-wider text-stone-400 mb-1 font-semibold"
+            >
+              Nomor Dana:
+            </p>
+            <p
+              class="font-mono text-lg md:text-xl font-bold tracking-widest text-stone-800 mb-4"
+              x-text="08966148677"
+            ></p>
+
+            <p
+              class="text-[9px] uppercase tracking-wider text-stone-400 mb-1 font-semibold"
+            >
+              Atas Nama:
+            </p>
+            <p
+              class="text-xs text-stone-700 font-semibold uppercase tracking-wide"
+            >
+              Yogi Mulyana
+            </p>
+
+            <button
+              @click="copyAccountNumberToClipboard()"
+              class="mt-6 w-full py-3 bg-white hover:bg-stone-50 text-dustyrose-700 font-semibold text-xs rounded-xl border border-dustyrose-200 transition-colors flex items-center justify-center gap-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-dustyrose-400"
+            >
+              📋 Salin Nomor Dana
+            </button>
+          </div>
+          <div
+            class="p-6 md:p-8 bg-dustyrose-50/50 border border-dustyrose-100 rounded-3xl max-w-sm mx-auto text-left relative overflow-hidden shadow-sm"
+          >
+            <div class="flex justify-between items-center mb-6">
+              <span class="font-bold text-sm tracking-widest text-dustyrose-800"
+                >DANA</span
+              >
+              <div
+                class="w-10 h-6 bg-dustyrose-200/20 border border-dustyrose-300/30 rounded"
+              ></div>
+            </div>
+
+            <p
+              class="text-[9px] uppercase tracking-wider text-stone-400 mb-1 font-semibold"
+            >
+              Nomor Dana:
+            </p>
+            <p
+              class="font-mono text-lg md:text-xl font-bold tracking-widest text-stone-800 mb-4"
+              x-text="83842787071"
+            ></p>
+
+            <p
+              class="text-[9px] uppercase tracking-wider text-stone-400 mb-1 font-semibold"
+            >
+              Atas Nama:
+            </p>
+            <p
+              class="text-xs text-stone-700 font-semibold uppercase tracking-wide"
+            >
+              Nurlia Sari
+            </p>
+
+            <button
+              @click="copyAccountNumberToClipboard()"
+              class="mt-6 w-full py-3 bg-white hover:bg-stone-50 text-dustyrose-700 font-semibold text-xs rounded-xl border border-dustyrose-200 transition-colors flex items-center justify-center gap-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-dustyrose-400"
+            >
+              📋 Salin Nomor Dana
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer
+        class="py-24 bg-stone-900 text-white text-center px-6 relative overflow-hidden"
+      >
+        <p
+          class="text-xs uppercase tracking-[0.25em] text-dustyrose-300/80 mb-4 font-semibold"
+        >
+          Terima Kasih
+        </p>
+        <h4 class="font-serif-title text-4xl font-light text-white mb-6">
+          Kami yang Berbahagia
+        </h4>
+        <h2
+          class="font-serif-title text-2xl font-light text-dustyrose-200 mb-8"
+        >
+          Yogi &amp; Lia
+        </h2>
+
+        <p
+          class="text-xs text-stone-400 max-w-sm mx-auto leading-relaxed italic"
+        >
+          Merupakan kehormatan serta kebahagiaan bagi kami sekeluarga apabila
+          Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu di hari
+          istimewa kami.
+        </p>
+
+        <div
+          class="mt-16 text-[10px] text-stone-500 uppercase tracking-[0.2em]"
+        >
+          &copy; 2026 Yogi &amp; Lia. All Rights Reserved.
+        </div>
+      </footer>
+
+      <!-- Toast Notification Pop-up banner (Non-intrusive alternative to browser alerts) -->
+      <div
+        x-cloak
+        x-show="toastBanner.isActive"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="translate-y-12 opacity-0"
+        x-transition:enter-end="translate-y-0 opacity-100"
+        x-transition:leave="transition ease-in duration-200"
+        x-transition:leave-start="translate-y-0 opacity-100"
+        x-transition:leave-end="translate-y-12 opacity-0"
+        class="fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50 bg-stone-900 text-white text-xs px-6 py-3.5 rounded-full shadow-2xl flex items-center gap-2.5 font-medium border border-white/10"
+      >
+        <span class="text-emerald-400 font-bold text-sm">✓</span>
+        <span x-text="toastBanner.message"></span>
+      </div>
+    </div>
+
+    <!-- Web Audio API Synthesizer & Fallback Audio Player Controller -->
+    <script>
+      let audioCtx = null;
+      let melodyInterval = null;
+      let isSynthesizerActive = false;
+      const backupAudio = document.getElementById("backup-audio-element");
+
+      function startInteractiveSynthesizer() {
+        return; // Diredam demi lagu Vocaroo kustom utama
+      }
+
+      function stopInteractiveSynthesizer() {
+        if (melodyInterval) {
+          clearInterval(melodyInterval);
+          melodyInterval = null;
+        }
+        if (audioCtx) {
+          audioCtx.close();
+          audioCtx = null;
+        }
+        isSynthesizerActive = false;
+      }
+
+      // Fungsi utama pengendali suara musik latar kustom Vocaroo
+      function startBackgroundMusic() {
+        if (backupAudio) {
+          backupAudio.volume = 0.85; // Volume optimal
+          const playPromise = backupAudio.play();
+          if (playPromise !== undefined) {
+            playPromise.catch((error) => {
+              console.log(
+                "Menunggu interaksi browser selesai untuk memainkan audio kustom.",
+              );
+            });
+          }
+        }
+      }
+
+      function stopBackgroundMusic() {
+        if (backupAudio) {
+          backupAudio.pause();
+        }
+      }
+    </script>
+
+    <script>
+      /**
+       * Global Instantiation Function weddingInvitationApp()
+       * Returns initial state and functions to prevent any "ReferenceError" or race condition inside Alpine.js context.
+       */
+      function weddingInvitationApp() {
+        return {
+          isCoverActive: true,
+          isMusicPlaying: false,
+          invitedGuest: "Tamu Undangan",
+          coverHeroImage:
+            "https://lh3.googleusercontent.com/d/1yaQSLet7BpJjmGazqYFrOWRRPxbLMOWK",
+          mapsNavigationUrl: "https://maps.app.goo.gl/V8cFvbUNFyHM8fo78",
+          mandiriAccountNumber: "1730009988776", // Rekening gift
+
+          // Lightbox properties
+          isLightboxActive: false,
+          lightboxSrc: "",
+
+          // 6 Galeri Foto Pasangan Sesuai Spesifikasi Prompt
+          galleryImages: [
+            "https://lh3.googleusercontent.com/d/1yaQSLet7BpJjmGazqYFrOWRRPxbLMOWK",
+            "https://lh3.googleusercontent.com/d/1yaQSLet7BpJjmGazqYFrOWRRPxbLMOWK",
+            "https://lh3.googleusercontent.com/d/1yaQSLet7BpJjmGazqYFrOWRRPxbLMOWK",
+            "https://lh3.googleusercontent.com/d/1yaQSLet7BpJjmGazqYFrOWRRPxbLMOWK",
+            "https://lh3.googleusercontent.com/d/1yaQSLet7BpJjmGazqYFrOWRRPxbLMOWK",
+            "https://lh3.googleusercontent.com/d/1yaQSLet7BpJjmGazqYFrOWRRPxbLMOWK",
+          ],
+
+          countdownClock: {
+            days: "00",
+            hours: "00",
+            minutes: "00",
+            seconds: "00",
+          },
+
+          toastBanner: {
+            isActive: false,
+            message: "",
+          },
+
+          rsvpFormData: {
+            name: "",
+            status: "Hadir",
+            totalGuests: "1",
+            message: "",
+          },
+
+          // Preset pesan/doa restu asli para tamu undangan
+          liveGuestWishes: [
+            {
+              id: 1,
+              name: "Budi Santoso",
+              status: "Hadir",
+              message:
+                "Selamat menempuh hidup baru Yogi & Lia! Semoga dilimpahi sakinah mawaddah warahmah selamanya.",
+            },
+            {
+              id: 2,
+              name: "Siti Rahma",
+              status: "Hadir",
+              message:
+                "Alhamdulillah turut bahagia untuk kelancaran jalannya acara kalian. Lancar sampai hari H ya Lia!",
+            },
+            {
+              id: 3,
+              name: "Ahmad Faisal",
+              status: "Tidak Hadir",
+              message:
+                "Selamat ya Yogi! Mohon maaf belum bisa hadir secara fisik dikarenakan penugasan dinas, tapi doa terbaik dari jauh selalu menyertai kalian.",
+            },
+          ],
+
+          init() {
+            // Ekstraksi parameter kustom penerima undangan: ?to=Nama+Tamu atau ?guest=Nama+Tamu
+            const locationParams = new URLSearchParams(window.location.search);
+            const nameKey =
+              locationParams.get("to") || locationParams.get("guest");
+            if (nameKey) {
+              this.invitedGuest = decodeURIComponent(
+                nameKey.replace(/\+/g, " "),
+              );
+            }
+            this.startLiveCountdownTimer();
+          },
+
+          openInvitationAndStart() {
+            this.isCoverActive = false;
+            this.isMusicPlaying = true;
+            // Aktifkan audio kustom
+            startBackgroundMusic();
+          },
+
+          toggleMusicState() {
+            this.isMusicPlaying = !this.isMusicPlaying;
+            if (this.isMusicPlaying) {
+              startBackgroundMusic();
+            } else {
+              stopBackgroundMusic();
+            }
+          },
+
+          openLightbox(src) {
+            this.lightboxSrc = src;
+            this.isLightboxActive = true;
+          },
+
+          startLiveCountdownTimer() {
+            // Target Hari H: Rabu 3 Juni 2026 pukul 08:00 WIB
+            const targetDate = new Date("2026-06-03T08:00:00+07:00").getTime();
+
+            setInterval(() => {
+              const now = new Date().getTime();
+              const gap = targetDate - now;
+
+              if (gap <= 0) {
+                this.countdownClock = {
+                  days: "00",
+                  hours: "00",
+                  minutes: "00",
+                  seconds: "00",
+                };
+                return;
+              }
+
+              const daysVal = Math.floor(gap / (1000 * 60 * 60 * 24));
+              const hoursVal = Math.floor(
+                (gap % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+              );
+              const minutesVal = Math.floor(
+                (gap % (1000 * 60 * 60)) / (1000 * 60),
+              );
+              const secondsVal = Math.floor((gap % (1000 * 60)) / 1000);
+
+              this.countdownClock.days = String(daysVal).padStart(2, "0");
+              this.countdownClock.hours = String(hoursVal).padStart(2, "0");
+              this.countdownClock.minutes = String(minutesVal).padStart(2, "0");
+              this.countdownClock.seconds = String(secondsVal).padStart(2, "0");
+            }, 1000);
+          },
+
+          submitRsvpData() {
+            if (this.rsvpFormData.name && this.rsvpFormData.message) {
+              // Tambahkan ucapan tamu secara instan ke daftar buku tamu digital
+              this.liveGuestWishes.unshift({
+                id: Date.now(),
+                name: this.rsvpFormData.name,
+                status: this.rsvpFormData.status,
+                message: this.rsvpFormData.message,
+              });
+
+              this.triggerCustomToast("Terima kasih! RSVP berhasil dikirim.");
+
+              // Kosongkan form isian pesan
+              this.rsvpFormData.message = "";
+            }
+          },
+
+          copyAccountNumberToClipboard() {
+            // Metode salin teks aman & responsif di dalam iFrame
+            const tempField = document.createElement("input");
+            tempField.value = this.mandiriAccountNumber;
+            document.body.appendChild(tempField);
+            tempField.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempField);
+
+            this.triggerCustomToast("Nomor Rekening berhasil disalin!");
+          },
+
+          triggerCustomToast(msg) {
+            this.toastBanner.message = msg;
+            this.toastBanner.isActive = true;
+            setTimeout(() => {
+              this.toastBanner.isActive = false;
+            }, 3000);
+          },
+        };
+      }
+    </script>
+  </body>
+</html>
